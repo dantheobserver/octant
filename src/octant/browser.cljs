@@ -1,7 +1,11 @@
-(ns starter.browser)
+(ns octant.browser
+  (:require [reagent.core :as r]
+            [goog.object :as obj]
+            [octant.views :as views]))
 
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load start []
+  (r/render [views/app] (.querySelector js/document "#app"))
   (js/console.log "start"))
 
 (defn ^:export init []

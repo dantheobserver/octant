@@ -3,8 +3,10 @@
  ["src"]
 
  :dependencies
- []
+ [[reagent "0.8.1"]
+  [cljsjs/react-with-addons "15.6.1-0"]]
 
+ :nrepl {:port 9000}
  :builds
  {:app {:target :browser
         :output-dir "public/js"
@@ -12,7 +14,7 @@
 
         :modules
         {:main ;; <- becomes public/js/main.js
-         {:entries [starter.browser]}}
+         {:entries [octant.browser]}}
 
         ;; start a development http server on http://localhost:8020
         :devtools

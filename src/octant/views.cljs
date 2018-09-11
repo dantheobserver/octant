@@ -45,18 +45,18 @@
       [:h1.title "No current tasks"])]])
 
 (defn hover-text [text]
-  (let [hover-idx (atom nil)
-        sel-idxs (atom #{})
+  (let [state (atom {:hover-idx nil
+                     :sel-idxs #{}})
         set-hover (fn [i]
-                    (when-not (get @sel-idxs i)
-                      (reset! hover-idx i)))
+                    (when-not (get-in @state [:sel-idxs i])
+                      (swap! state assoc :hover-idx i)))
         toggle-select (fn [i]
-                        (if (get @sel-idxs i)
-                          (do
-                            (swap! sel-idxs disj i)
+                        (if (get-in @state [:sel-idxs i])
+                          (do ;deselect current word
+                            (swap! state update :sel-idxs disj i)
                             (set-hover i))
-                          (do
-                            (swap! sel-idxs conj i)
+                          (do ;select current word
+                            (swap! state update :sel-idxs conj i)
                             (set-hover nil))))]
     (fn [text]
       [:span
@@ -67,9 +67,9 @@
                                :on-click #(do
                                             (toggle-select i)
                                             (.stopPropagation %))
-                               :class (when (get @sel-idxs i) "tag is-info")}
+                               :class (when (get-in @state [:sel-idxs i]) "tag is-info")}
                         [:span
-                         (when (= @hover-idx i) {:class "tag is-primary"})
+                         (when (= (:hover-idx @state) i) {:class "tag is-primary"})
                          word]
                         [:span " "]])
                      (string/split text #"\s+")))])))
@@ -81,10 +81,19 @@
    [:section.section
     [hover-text task]]])
 
+(defn hover-menu []
+  [:div.box
+   [:div.container
+    [:figure.image.is-96by96]
+    [:figure.image.is-96by96]
+    [:figure.image.is-96by96]]
+   ])
+
 (defn app []
-  [:div
+  [:<>
    [banner]
-   [:section.section
-    (for [task (todos-seq)]
-      ^{:key (:id task)}
-      [list-item task])]])
+   [:div.list
+    [:section.section
+     (for [task (todos-seq)]
+       ^{:key (:id task)}
+       [list-item task])]]])

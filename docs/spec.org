@@ -1,0 +1,3 @@
+* features
+** "filter" by theme/priority [time, location]
+** display composite view of elements in the tasks

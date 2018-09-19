@@ -2,13 +2,13 @@
   (:require ["react" :as react]
             [reagent.core :as r]
             [goog.object :as obj]
-            [octant.views.app :refer [app]]
+            [octant.views.core :as views]
             [cljss.core :as css]))
 
 ;; start is called by init and after code reloading finishes
 (defn ^:dev/after-load start []
   (css/remove-styles!)
-  (r/render [app] (.querySelector js/document "#app"))
+  (r/render [views/app] (.querySelector js/document "#app"))
   (js/console.log "start"))
 
 (defn ^:export init []

@@ -1,13 +1,34 @@
 (ns octant.state.selectors
-  (:require [octant.state.store :refer [app-state]]))
+  (:require [reagent.core :as r]
+            [octant.state.core :refer [app-state]]))
 
 ;; State selectors
 (defn todos [] (:todos @app-state))
 
-(defn todos-seq [] (vals (todos)))
+(defn task-ids []
+  (-> @(r/track todos)
+      keys
+      sort))
 
-(defn task-by-id [id]
-  (first (filter #(= (:id %) id) (todos))))
+(defn task [id]
+  (-> @(r/track todos)
+      (get id)))
+
+(defn todos-seq [] (-> @(r/track todos)
+                       vals))
 
 (defn active-task []
-  (first (filter #(:active %) (todos-seq))))
+  (->> @(r/track todos-seq)
+      (filter #(:active? %))
+      first))
+
+;; Popup
+(defn hover-popup [] (:hover-popup @app-state))
+
+(defn hover-visible []
+  (-> @(r/track hover-popup)
+      (get :visible)))
+
+(defn hover-coordinates []
+  (-> @(r/track hover-popup)
+      (get :coordinates)))

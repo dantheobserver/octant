@@ -6,7 +6,7 @@
 (def base-font-px 16)
 (def root-font-pct 62.5)
 (def root-font-px (* base-font-px (/ root-font-pct 100)))
-(def px-rm-ratio (/ 1 root-font-px))
+(def px-rm-ratio (/ 1 base-font-px))
 
 (defn *rm
   "given a `px` value, will convert it to rem
@@ -14,10 +14,6 @@
   [px]
   (str (* px-rm-ratio px) "rem"))
 
-(defn class-names [& names]
-  (string/join " " names))
-
-;; TODO: add pixel/rm conversion here
 (defn style-val [& props]
   (string/join " " props))
 
@@ -46,13 +42,12 @@
    :right 0
    :box-shadow (style-val 0 (*rm 10) (*rm 10) (*rm -5) (rgba 146 209 198 0.6))})
 
-(let [width (*rm 250)
-      height (*rm 70)]
+(let [width 250
+      height 70]
   (defstyled popup :div
     {:position "absolute"
-     :float "left"
      :z-index 100
-     :width width
-     :height height
-     :left (with-meta #(calc (*rm %) "-" width) :x)
-     :top (with-meta #(*rm %) :y)}))
+     :width (*rm width)
+     :height (*rm height)
+     :left (with-meta #(calc (*rm %) "-" (*rm (/ width 2))) :x)
+     :top (with-meta #(calc (*rm %) "-" (*rm (+ height 20))) :y)}))

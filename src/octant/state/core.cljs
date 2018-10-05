@@ -15,4 +15,4 @@
                                     2 {:id 2 :task "Take the train to post office"}
                                     3 {:id 3 :task "Research lessons on Reagent"}
                                     4 {:id 4 :task "get food at River market for   dinner"}}
-                            :hover-popup {:visible? false :x 0 :y 0}}))
+                            :hover-popup {:visible? true :x 0 :y 0}}))

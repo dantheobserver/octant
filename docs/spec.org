@@ -1,3 +1,22 @@
 * features
 ** "filter" by theme/priority [time, location]
 ** display composite view of elements in the tasks
+* Ideas for improvement
+** Redux-like messaging for updates or re-frame solution
+   #+BEGIN_SRC clojurescript
+     ;; Idea for creating redux-like actions
+     ;; (action-handler {:tasks/add {:id 0 :task "Take garbage out every day"}})
+     ;; (action-handler {:tasks/delete 1})
+     (defn action-handler [{:keys [type data]}]
+       ;; Do some type validation here to prevent malformed data
+       (condp = type
+         :tasks/add (when-not (sel/task id)
+                      (swap! app-state assoc-in [:todos] data))
+         :tasks/delete (swap! app-state update-in [:todos] dissoc data)))
+
+     (defn emit-action [type-key data]
+       (action-handler {:type type-key :data data}))
+
+     (defn add-task [task] (emit-action :task/add task))
+     (defn delete-task [id] (emit-action :task/delete id))
+   #+END_SRC

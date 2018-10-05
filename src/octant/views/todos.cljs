@@ -1,16 +1,18 @@
 (ns octant.views.todos
   (:require [reagent.core :as r]
-            [clojure.string :as string]
+            [clojure.string :as str]
             [octant.state.selectors :as sel]
-            [octant.actions :as actions]
-            [octant.views.styles :as styles :refer [class-names]]))
+            [octant.state.actions :as actions]
+            [octant.views.styles :as styles]))
+
+(def classes #(str/join " " %&))
 
 ;; Views
 (defn icon [name props]
   [:ion-icon (merge props {:name name})])
 
 (defn banner []
-  [:section {:class (class-names (styles/banner) "hero" "is-primary")}
+  [:section {:class (classes (styles/banner) "hero" "is-primary")}
    [:div.hero-body
     (if-let [task (sel/active-task)]
       [:div
@@ -20,8 +22,13 @@
 
 (defn get-target-coords [evt]
   (let [target (aget evt "target")
+        y (.-offsetTop target)
         rect (.getBoundingClientRect target)]
-    [(.-left rect) (.-top rect)]))
+    [(.-left rect) y]))
+
+(def elem-scroll-height (memoize (fn [sel]
+                                   (if-let [elem (js/document.querySelector sel)]
+                                     (.-scrollHeight elem)))))
 
 (defn hover-text
   "Creates a string made up of elements from `text`
@@ -47,7 +54,7 @@
                        ^{:key i}
                        [:span {:on-mouse-enter (fn [e]
                                                  (let [[x y] (get-target-coords e)]
-                                                   (actions/set-popup-loc x y)
+                                                   (actions/move-popup x y)
                                                    #(set-hover i)))
                                :on-mouse-leave #(set-hover nil)
                                :on-click #(do
@@ -58,19 +65,20 @@
                          (when (= (:hover-idx @state) i) {:class "tag is-primary"})
                          word]
                         [:span " "]])
-                     (string/split text #"\s+")))])))
+                     (str/split text #"\s+")))])))
 
 (defn list-item [id]
   (let [{:keys [active? task]} @(r/track sel/task id)]
     [:div.box (merge
-               {:on-click #(actions/set-active-task! id)
-                :class (when active? "has-background-light")})
+               {:on-click #(actions/set-active-task id)
+                :class (classes "todo-list__list-item"
+                                (when active? "has-background-light"))})
      [:section.section
       [hover-text task]]]))
 
 (defn todo-list []
   (let [task-ids @(r/track sel/task-ids)]
-    [:div {:class (styles/todo-list)}
+    [:div {:class (classes "todo-list" (styles/todo-list))}
      [:section.section
       (for [id task-ids]
         ^{:key id}
@@ -78,9 +86,8 @@
 
 (defn hover-popup []
   (let [{:keys [x y visible?]} @(r/track sel/hover-popup)]
-    (styles/popup {:x x :y y :class "box"}
+    (styles/popup {:x x :y y :class (classes "hover-popup" "box")}
                   [:div.columns
                    [:div.column "test"]
                    [:div.column "test"]
-                   [:div.column "test"]
-                   ])))
+                   [:div.column "test"]])))
